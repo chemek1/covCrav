@@ -28,14 +28,14 @@ top_srcdir = ..
 top_builddir = ..
 
 
-prefix = /usr
+prefix = /usr/local
 exec_prefix = ${prefix}
 datadir = ${datarootdir}
 datarootdir = ${prefix}/share
-libdir = ${exec_prefix}/lib64
+libdir = ${exec_prefix}/lib
 localedir = ${datarootdir}/locale
 subdir = po
-install_sh = ${SHELL} /var/home/anouarchemek/phyCar/src/covcrav2/install-sh
+install_sh = ${SHELL} /var/home/anouarchemek/Documents/covCrav/covCrav/covcrav2/install-sh
 # Automake >= 1.8 provides $(MKDIR_P).
 # Until it can be supposed, use the safe fallback:
 mkdir_p = $(install_sh) -d

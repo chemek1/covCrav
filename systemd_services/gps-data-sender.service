@@ -1,0 +1,14 @@
+[Unit]
+Description=Itsnet--- GPS DATA SENDER [ Management Layer ]
+#Requires=itsnet.service
+#After=itsnet.service
+[Service]
+ExecStart=/home/covcrav/phyCar/src/itsnet/gps-data-sender/gps_position_sender /usr/share/itsnet_app/data_1
+WorkingDirectory=/home/covcrav/phyCar/src/itsnet/gps-data-sender/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+Environment=SYSTEMD_LOG_LEVEL=debug
+[Install]
+WantedBy=multi-user.target

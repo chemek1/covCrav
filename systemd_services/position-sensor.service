@@ -1,0 +1,15 @@
+[Unit]
+Description=Itsnet Position Sensor [ Management Layer ]
+#Requires=gpsd-fix.service
+#After=gpsd-fix.service
+[Service]
+ExecStart=/home/covcrav/phyCar/src/itsnet/position-sensor/position_sensor
+WorkingDirectory=/home/covcrav/phyCar/src/itsnet/position-sensor/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+Environment=SYSTEMD_LOG_LEVEL=debug
+[Install]
+WantedBy=multi-user.target
+Also=gpsd-fix.service

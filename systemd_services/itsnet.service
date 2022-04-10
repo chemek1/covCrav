@@ -1,0 +1,14 @@
+[Unit]
+Description=Itsnet layer [ GeoNetworking ]
+#Requires=gpsd.service
+#After=gpsd.service
+[Service]
+ExecStart=nice -n -20 /home/covcrav/phyCar/src/itsnet/src/itsnet
+WorkingDirectory=/home/covcrav/phyCar/src/itsnet/src/
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+User=root
+Environment=SYSTEMD_LOG_LEVEL=debug
+[Install]
+WantedBy=multi-user.target

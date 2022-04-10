@@ -1,0 +1,13 @@
+[Unit]
+Description=waiting until gpsd got a position FIX
+Requires=gpsd.service
+After=gpsd.service
+[Service]
+ExecStart=/bin/bash /root/act_on_gps_fix.sh
+WorkingDirectory=/root/
+StandardOutput=inherit
+StandardError=inherit
+User=root
+Type=oneshot
+[Install]
+WantedBy=multi-user.target

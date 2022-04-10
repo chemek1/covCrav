@@ -1,0 +1,13 @@
+[Unit]
+Description=Itsnet Wireless adhoc configuration
+#Requires=ntpd.service
+#After=ntpd.service
+[Service]
+ExecStart=/bin/bash /home/covcrav/phyCar/src/itsnet/extra/start.sh
+WorkingDirectory=/home/covcrav/phyCar/src/itsnet/extra/
+StandardOutput=inherit
+StandardError=inherit
+User=root
+Type=oneshot
+[Install]
+WantedBy=multi-user.target

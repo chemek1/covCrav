@@ -1,6 +1,6 @@
 #!/bin/bash
 #source /home/covcrav/phyCar/src/itsnet_app/config/testbed.sh
-INTF1=wlp1s0u1u4
+INTF1=wlp0s20u1
 INTF2=wlan0
 PATH_ITSNET_CONF="/home/covcrav/phyCar/src/itsnet/extra"
 GREP_OCB=`grep "OCB = true" $PATH_ITSNET_CONF/itsnet.conf | cut -f3 -d' '`
