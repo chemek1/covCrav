@@ -34,6 +34,8 @@
 #ifndef _ITSNET_H_
 #define _ITSNET_H_ 1
 
+#include "itsnet_common.h" 
+
 int itsnet_cleanup();
 
 int itsnet_main(int argc, char** argv);

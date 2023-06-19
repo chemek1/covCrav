@@ -49,12 +49,15 @@ int itsnet_event_indication_send(struct message* m);
 int itsnet_geounicast_request_receive(struct message* m);
 int itsnet_geoanycast_request_receive(struct message* m);
 int itsnet_geobroadcast_request_receive(struct message* m);
+int itsnet_btp_request_receive(struct message* m ) ; 
+
 int itsnet_unicast_confirm_send(int res);
 int itsnet_geoanycast_confirm_send(int res);
 int itsnet_geobroadcast_confirm_send(int res);
 int itsnet_unicast_indication_send(struct itsnet_packet* p);
 int itsnet_geoanycast_indication_send(struct itsnet_packet* p);
 int itsnet_geobroadcast_indication_send(struct itsnet_packet* p);
+
 
 int itsnet_get_security_param_request_receive(struct message* m);
 int itsnet_configure_security_param_request_receive(struct message* m);

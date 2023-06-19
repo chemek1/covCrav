@@ -31,6 +31,9 @@
  * @author anouar Chemek
  */
  
+#ifndef _ITSNET_CONSTANT_
+#define _ITSNET_CONSTANT_
+ 
  
  #define ITSNET_DATA_SIZE 200
 
@@ -41,10 +44,10 @@
 #define ITSNET_GEOANYCAST_CIRCLE 0
 #define ITSNET_GEOANYCAST_RECT 1
 #define ITSNET_BEACON 0
-#define TRANSPORT_NEXT_HEADER 200
+#define TRANSPORT_NEXT_HEADER 2000
 #define NODE_ID_LEN 8
 #define MAX_LLA_LEN 6
-#define TIME_BEACON_INTERVAL 1000
+#define TIME_BEACON_INTERVAL 100
 #define TIMEOUT_NODE 5000
 #define UNSPECIFIED 0
 
@@ -189,3 +192,5 @@ enum header_flag {
  * value of Traffic Class field in the common header
  */
 enum traffic_class { CLASS00 = 0, CLASS01 = 1, CLASS02 = 2, CLASS03 = 3 };
+
+#endif ; 

@@ -1,8 +1,8 @@
 #!/bin/bash
 #source /home/covcrav/phyCar/src/itsnet_app/config/testbed.sh
-INTF1=wlp0s20u1
+INTF1=wlxe01cfc46d3be
 INTF2=wlan0
-PATH_ITSNET_CONF="/home/covcrav/phyCar/src/itsnet/extra"
+PATH_ITSNET_CONF="/home/pfe-aes-18/covCrav/itsnet/extra"
 GREP_OCB=`grep "OCB = true" $PATH_ITSNET_CONF/itsnet.conf | cut -f3 -d' '`
 echo $GREP_OCB
 if [[ $GREP_OCB = "true" ]]; then
@@ -21,7 +21,7 @@ fi
 
 #### Loading wireless Driver ###########################
 
-modprobe -r brcmfmac
+#modprobe -r brcmfmac
 
 if [[ $MODE = "IBSS" ]]; then 
 	modprobe -r 8188eu;modprobe -r r8188eu;

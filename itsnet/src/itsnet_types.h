@@ -40,8 +40,20 @@
 #include <stdint.h>
 #include "itsnet_header.h"
 
+
+
 #define MAX_NEIGHBOR_LIST 100
 #define MES_PAYLOAD_LEN 1500
+
+#define BTPA 0
+#define BTPB 1
+
+typedef uint16_t destination_port_t; /* destination port type */
+typedef uint16_t max_packet_lifetime_t; 
+typedef uint64_t certificate_Id_t;
+typedef uint8_t ssp_length_t;
+typedef uint16_t rem_packet_lifetime_t;
+typedef uint8_t rem_hop_limit_t;
 
 /**
 * type of sap
@@ -87,7 +99,10 @@ enum itsnet_message_id
 
 	/** security sap */
 	itsnet_get_security_param,	/** get_security_param */
-	itsnet_configure_security_param	/** configure_security_param */
+	itsnet_configure_security_param, 	/** configure_security_param */
+	
+	/** btp request */ 
+	itsnet_btp_request       /** btp_data_request */  
 
 };
 
@@ -449,7 +464,59 @@ typedef struct itsnet_configure_security_param_request itsnet_configure_security
 
 /**
  *The structure describes Message types
- */
+*/
+
+
+/*typedef enum btp_port {
+    btp_Port_UNSPECIFIED = 0,
+    btp_port_CAM = 2001,
+    btp_port_DENM = 2002,
+    btp_port_MAPEM = 2003,
+    btp_port_SPATEM = 2004,
+    btp_port_SAEM = 2005,
+    btp_port_IVIM = 2006,
+    btp_port_SREM = 2007,
+    btp_port_SSEM = 2008,
+    btp_port_CPM = 2009,
+    btp_port_EVCSN = 2010,
+    btp_port_TPG = 2011,
+    btp_port_EV_RSR = 2012,
+    btp_port_RTCMEM = 2013,
+    btp_port_CTLM = 2014,
+    btp_port_CRLM = 2015,
+    btp_port_EC_AT = 2016,
+    btp_port_MCDM = 2017,
+    btp_port_VAM = 2018,
+    btp_port_IMZM = 2019
+} e_btp_port; */
+
+/*typedef struct data {   
+        DENM_t* denm;        
+} data_t;*/
+
+/*typedef struct btp_tx_params {
+    int btp_type;
+    e_btp_port source_port;
+    e_btp_port destination_port;
+    enum itsnet_header_type packet_transport_type;
+    uint8_t destination_address[MAX_LLA_LEN];
+    itsnet_traffic_class traffic_class;
+    DENM_t data;
+} btp_tx_params_t;
+
+typedef struct btp_header {
+    e_btp_port source_port;
+    e_btp_port destination_port;
+} btp_header_t;
+
+typedef struct btp_pdu {
+    btp_header_t btp_header;
+    DENM_t payload;
+    size_t payload_length;
+} btp_pdu_t;
+
+btp_pdu_t* btp_data_request(btp_tx_params_t params); */
+
 struct message
 {
 
@@ -482,14 +549,20 @@ struct message
 		struct itsnet_geotopo_request itsnet_geotopo_req;
 		struct itsnet_geotopo_confirm itsnet_geotopo_conf;
 		struct itsnet_geotopo_indication itsnet_geotopo_ind;
-
 		struct itsnet_get_security_param_request itsnet_get_security_param_req;
 		struct itsnet_configure_security_param_request itsnet_configure_security_param_req;
+		struct btp_b_pdu btp ; 
 
 	} payload;
 
 };
 
 typedef struct message message;
+
+
+
+
+
+
 
 #endif	/* _ITSNET_TYPES_H_*/

@@ -38,39 +38,43 @@
 
 #include <stdint.h>
 #include "itsnet_constant.h"
+#include "itsnet_btp.h" 
+#include "itsnet_common.h" 
 
 
 
 typedef uint16_t itsnet_payload_lenght; /** total lenght of the datagram in octet (data + header) */
 typedef uint8_t itsnet_hop_limit;       /** time to leave, max number of hops */
-typedef uint32_t itsnet_time_stamp;     /** time stamp at which the position was acquired*/
+//typedef uint32_t itsnet_time_stamp;     /** time stamp at which the position was acquired*/
 
 /*typedef char itsnet_node_id[8];*/ /** identifier of the ITS station (not yet defined)*/
 
 typedef uint32_t itsnet_latitude;     /** latitude of the ITS station */
 typedef uint32_t itsnet_longitude;    /** longitude of the ITS station*/
-typedef uint16_t itsnet_speed;        /** speed of the ITS station*/
-typedef uint16_t itsnet_heading;      /** heading of the ITS station*/
+typedef uint8_t itsnet_speed;        /** speed of the ITS station*/ /*** updated (était sur 16 bits */
+typedef uint8_t itsnet_heading;      /** heading of the ITS station*/ /*** updated (était sur 16 bits) */ 
 typedef uint16_t itsnet_altitude;     /** altitude of the ITS station*/
 typedef uint8_t itsnet_txpower;       /** Transmission power level with which the packet was sent, in 1⁄2 of dBm*/
 typedef uint8_t itsnet_flags;         /** Flags reserved to distinguish vehicle and RSU */
-typedef uint8_t itsnet_traffic_class; /** Traffic class parameter*/
+//typedef uint8_t itsnet_traffic_class; /** Traffic class parameter*/
 
 /** The transport porotocol, i.e. the usage of port numbers are still under discussion.*/
 typedef uint16_t itsnet_source_port;      /** Port number of the sending application. It is zero if not used */
 typedef uint16_t itsnet_destination_port; /**Port number of the destination application. It is zero if not used.*/
 typedef uint16_t itsnet_radius;
 typedef uint8_t itsnet_channel;
+typedef uint16_t sequence_number_t ; 
+typedef uint16_t reserved_1_t ; 
 
 /**
  *The structure describes itsnet identity
  */
 
-struct itsnet_node_id {
+/*struct itsnet_node_id {
     uint8_t id[NODE_ID_LEN];
 };
 
-typedef struct itsnet_node_id itsnet_node_id;
+typedef struct itsnet_node_id itsnet_node_id;*/
 
 /**
  *itsnet position vector accuracy
@@ -103,16 +107,16 @@ typedef struct itsnet_short_position_vector itsnet_short_position_vector;
 /**
  *itsnet position vector
  */
-struct itsnet_position_vector {
-    itsnet_node_id node_id;
-    itsnet_time_stamp
-        time_stamp; /** UTC time in seconds, when the GPS data was calculated,NOT the time this message was generated */
-    itsnet_latitude latitude;   /** the latitude of the global position in 1/8 microdegree */
-    itsnet_longitude longitude; /** the longitude of the global position in 1/8 microdegree*/
-    itsnet_speed speed;         /** current speed in 0.01 meters per second*/
-    itsnet_heading heading;     /** current curse in 0.005493247 degrees*/
-};
-typedef struct itsnet_position_vector itsnet_position_vector;
+/*struct itsnet_position_vector {*/
+   // itsnet_node_id node_id;
+    //itsnet_time_stamp
+      //  time_stamp; /** UTC time in seconds, when the GPS data was calculated,NOT the time this message was generated */
+    //itsnet_latitude latitude;   /** the latitude of the global position in 1/8 microdegree */
+    //itsnet_longitude longitude; /** the longitude of the global position in 1/8 microdegree*/
+    //itsnet_speed speed;         /** current speed in 0.01 meters per second*/
+    //itsnet_heading heading;     /** current curse in 0.005493247 degrees*/
+/*};
+typedef struct itsnet_position_vector itsnet_position_vector;*/
 
 
 /**
@@ -158,16 +162,16 @@ typedef struct itsnet_common_header itsnet_common_header;
 /**
  * value of header type
  */
-enum itsnet_header_type {
+/*enum itsnet_header_type {*/
 
-    itsnet_any_id = 0,      /** value of packet unspecified */
-    itsnet_beacon_id,       /** value of packet Beacon */
-    itsnet_unicast_id,      /** value of packet Geo-unicast  */
-    itsnet_geoanycast_id,   /** value of packet Geo-anycast */
-    itsnet_geobroadcast_id, /** value of packet Geo-broadcast */
-    itsnet_tsb_id,          /** value of packet Topologically-scoped broadcast */
-    itsnet_ls_id            /** value of packet Location service */
-};
+    //itsnet_any_id = 0,      /** value of packet unspecified */
+   // itsnet_beacon_id,       /** value of packet Beacon */
+    //itsnet_unicast_id,      /** value of packet Geo-unicast  */
+   // itsnet_geoanycast_id,   /** value of packet Geo-anycast */
+    //itsnet_geobroadcast_id, /** value of packet Geo-broadcast */
+    //itsnet_tsb_id,          /** value of packet Topologically-scoped broadcast */
+   // itsnet_ls_id           /** value of packet Location service */
+//};
 
 /**
  *The structure describes itsnet_any packet
@@ -222,7 +226,9 @@ typedef struct itsnet_geoanycast_t itsnet_geoanycast_t;
 /**
  *The structure describes itsnet_geobroadcast packet
  */
-struct itsnet_geobroadcast_t {
+ 
+ 
+ struct itsnet_geobroadcast_t {
     itsnet_position_vector source_position_vector; /** Source node position vector */
     itsnet_radius geo_area_size;                   /** radius/height,latitude and longitude (geo-area destination)   */
     itsnet_latitude dest_latitude;
@@ -231,7 +237,41 @@ struct itsnet_geobroadcast_t {
     itsnet_position_vector forwarder_position_vector; /** The Position Vector of the last forwarder (node from which the packet comes)*/
 
 };
-typedef struct itsnet_geobroadcast_t itsnet_geobroadcast_t;
+
+
+struct itsnet_geobroadcast_btp_t {
+	sequence_number_t sequence_number ; 
+	reserved_1_t reserved_1 ; 
+	itsnet_position_vector source_position_vector ;
+	itsnet_latitude dest_latitude ; 
+	itsnet_longitude dest_longitude ; 
+	itsnet_radius radius ; 
+	uint16_t distance_b ; 
+	uint16_t angle ; 
+	uint16_t reserved_2 ; 
+	//btp_pdu_t btp ; 
+	
+} ; 
+ 
+ /*struct itsnet_geobroadcast_t {
+    uint16_t sequence_number ; //updated 
+    uint16_t reserved_1 ; //updated 
+    itsnet_position_vector source_position_vector; /** Source node position vector */
+    //itsnet_radius geo_area_size;                   /** radius/height,latitude and longitude (geo-area destination)   */
+    //itsnet_latitude dest_latitude;
+    //itsnet_longitude dest_longitude;
+    //itsnet_radius radius ; 
+    //uint16_t distance_b ; 
+    //uint16_t angle ; 
+    //short payload[ITSNET_DATA_SIZE]; /** data temp must be fixed*/
+    //itsnet_position_vector forwarder_position_vector; /** The Position Vector of the last forwarder (node from which the packet comes)*/
+    //uint16_t reserved_2 ; 
+//};
+//typedef struct itsnet_geobroadcast_t itsnet_geobroadcast_t;
+ 
+ 
+ 
+
 
 /**
  *The structure describes itsnet_tsb packet
@@ -299,10 +339,25 @@ struct itsnet_packet {
         struct itsnet_geoanycast_t itsnet_geoanycast;     /** Geo-anycast */
         struct itsnet_geobroadcast_t itsnet_geobroadcast; /** Geo-broadcast */
         struct itsnet_tsb_t itsnet_tsb;                   /** Topologically-scoped broadcast */
-        struct itsnet_ls_t itsnet_ls;                     /** Location service */
+        struct itsnet_ls_t itsnet_ls; 
+        struct itsnet_geobroadcast_btp_t itsnet_geobroadcast_btp ; /** Location service */
     } payload;
-    
+   btp_pdu_t btp;                                         /** btp packet */
+       
 };
+
+
+/******* updated *********/
+struct itsnet_btp_packet {
+
+	struct itsnet_basic_header basic_header;
+    	struct itsnet_common_header common_header;
+	struct itsnet_geobroadcast_btp_t itsnet_geobroadcast_btp ; 
+	btp_b_pdu_t btp ; 
+
+} ; 
+
+/**********************/
 
 typedef struct itsnet_packet itsnet_packet;
 

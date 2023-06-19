@@ -2,7 +2,8 @@
 #define __BTP_
 
 #include "itsnet_header.h"
-#include "denm.h" 
+//#include "denm.h" 
+#include "facilities.h" 
 
 #define BTPA 0
 #define BTPB 1
@@ -13,6 +14,9 @@ typedef uint64_t certificate_Id_t;
 typedef uint8_t ssp_length_t;
 typedef uint16_t rem_packet_lifetime_t;
 typedef uint8_t rem_hop_limit_t;
+typedef uint32_t destination_port_info_t ; 
+
+
 
 //updated : ETSI TS 103 248 V2.1.1 (2021-08)
 typedef enum btp_port {
@@ -42,28 +46,60 @@ typedef enum btp_port {
         DENM_t* denm;        
 } data_t;*/
 
+
+
 typedef struct btp_tx_params {
     int btp_type;
     e_btp_port source_port;
     e_btp_port destination_port;
-    enum itsnet_header_type packet_transport_type;
-    uint8_t destination_address[MAX_LLA_LEN];
-    itsnet_traffic_class traffic_class;
+    enum itsnet_header_type packet_transport_type; //header
+    uint8_t destination_address[MAX_LLA_LEN]; 
+    uint8_t traffic_class; //header
     DENM_t data;
 } btp_tx_params_t;
 
-typedef struct btp_header {
+typedef struct btp_rx_params {
+
+	e_btp_port source_port; 
+	e_btp_port destination_port ; 
+	enum itsnet_header_type packet_transport_type ; 
+	uint8_t destination_address[MAX_LLA_LEN] ; 
+	itsnet_position_vector source_position_vector ; 
+	uint8_t traffic_class ; 
+	int length ; 
+	DENM_t data ;
+} btp_rx_params_t ; 
+
+/*typedef struct btp_header {
     e_btp_port source_port;
     e_btp_port destination_port;
-} btp_header_t;
+} btp_header_t;*/
 
-typedef struct btp_pdu {
+
+typedef struct btp_b_header {
+	
+	e_btp_port destination_port ;
+	//uint32_t destination_port ; 
+	destination_port_info_t destination_port_info ; 
+	
+} btp_b_header_t ;
+
+typedef struct btp_b_pdu {
+	btp_b_header_t btp_header ; 
+	DENM_t payload ; 
+	//size_t payload_length ; 
+} btp_b_pdu_t ;
+
+/*typedef struct btp_pdu {
     btp_header_t btp_header;
     DENM_t payload;
-    size_t payload_length;
-} btp_pdu_t;
+    //size_t payload_length;
+} btp_pdu_t;*/
 
 struct message* btp_data_request(btp_tx_params_t params);
-
+void btp_data_indication(btp_rx_params_t params) ; 
 
 #endif 
+
+
+

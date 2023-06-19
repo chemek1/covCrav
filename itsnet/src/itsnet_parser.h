@@ -34,6 +34,7 @@
 #define _ITSNET_PARSER_H_ 1
 
 #include "itsnet_header.h"
+
 #include <stdint.h>
 #include <stdbool.h>
 

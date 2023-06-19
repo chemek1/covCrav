@@ -45,6 +45,7 @@ static cfg_opt_t opts[] = {
     CFG_INT("LocationTableEntry", 5, CFGF_NONE),
     CFG_STR("EthPItsnet", "0x707", CFGF_NONE),
     CFG_BOOL("SendBeacon", cfg_false, CFGF_NONE),
+    CFG_BOOL("SendGeoBroadcast", cfg_false, CFGF_NONE),
     CFG_INT("DebugLevel", 3, CFGF_NONE),
     CFG_BOOL("DetachFromTTY", cfg_false, CFGF_NONE),
     CFG_STR("NodeId","aa:aa:bb:bb:cc:cc:00:11", CFGF_NONE),
@@ -277,6 +278,12 @@ char* EthPItsnet_parse(void)
 int SendBeacon_parse(void)
 {
     return (cfg_getbool(cfg, "SendBeacon"));
+}
+
+
+int SendGeoBroadcast_parse(void)
+{
+    return (cfg_getbool(cfg, "SendGeoBroadcast"));
 }
 
 /**

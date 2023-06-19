@@ -1,4 +1,6 @@
 #include <sys/time.h>
+#include <stdint.h> 
+
 #include "time_functions.h" 
 
 long timeval_to_ms(struct timeval t)

@@ -52,6 +52,7 @@
 
 #include "geo_anycast.h"
 #include "geo_broadcast.h"
+#include "beaconing.h" 
 #include "geo_unicast.h"
 #include "itsnet_header.h"
 #include "itsnet_listener.h"
@@ -69,6 +70,8 @@ static pthread_mutex_t mutex;
 static pthread_t itsnet_listener;
 
 static int sock;
+
+unsigned char byte = 0xb4 ; 
 
 
 /**
@@ -518,6 +521,10 @@ int itsnet_geobroadcast_request_receive(struct message* m)
     pos = get_position_vector();
     p = (itsnet_packet*)malloc(sizeof(itsnet_packet));
     struct itsnet_node_id nodeId;
+    
+    
+    
+    
 
     if(p == NULL) {
         printf("erreur allocation \n");
@@ -554,14 +561,221 @@ int itsnet_geobroadcast_request_receive(struct message* m)
         p->payload.itsnet_geobroadcast.dest_longitude = m->payload.itsnet_geobroadcast_req.geo_area.longitude;
         p->payload.itsnet_geobroadcast.geo_area_size = m->payload.itsnet_geobroadcast_req.geo_area.geo_area_size;
 
-        /*memcpy(p->payload.itsnet_geobroadcast.payload,m->payload.itsnet_geobroadcast_req.data,1482);*/
-        memcpy(p->payload.itsnet_geobroadcast.payload, m->payload.itsnet_geobroadcast_req.data, ITSNET_DATA_SIZE);
+        memcpy(p->payload.itsnet_geobroadcast.payload,m->payload.itsnet_geobroadcast_req.data,1482);
+        memcpy(p->payload.itsnet_geobroadcast.payload, m->payload.itsnet_geobroadcast_req.data, ITSNET_DATA_SIZE); 
         gettimeofday(&t_emit, NULL);
         result = itsnet_geobroadcast_send(p);
         trace_emit_packet(t_emit);
     }
-    //	result=itsnet_geobroadcast_confirm_send(result);
+    result=itsnet_geobroadcast_confirm_send(result);
     return result;
+}
+
+void decimalToHexadecimal(int decimal) {
+    char hexadecimal[100];
+    int index = 0;
+    
+    while (decimal > 0) {
+        int remainder = decimal % 16;
+        
+        if (remainder < 10) {
+            hexadecimal[index] = remainder + '0';
+        } else {
+            hexadecimal[index] = remainder - 10 + 'A';
+        }
+        
+        decimal /= 16;
+        index++;
+    }
+    
+    printf("La valeur en hexadécimal est : ");
+    
+    for (int i = index - 1; i >= 0; i--) {
+        printf("%c", hexadecimal[i]);
+    }
+    
+    printf("\n");
+}
+
+
+int itsnet_btp_request_receive(struct message* m) {
+	
+	
+	long x2 = 45 ; 
+	int result;
+    	//struct itsnet_packet* p;
+    	
+    	struct itsnet_btp_packet* p ; 
+    	
+    	struct itsnet_position_vector pos;
+    	static struct timeval t_emit;
+    	pos = get_position_vector();
+    	uint8_t brodcast_mac[MAX_LLA_LEN];
+    	long x = sizeof(btp_b_pdu_t) ; 
+    	
+    	x = htonl(x) ;
+	printf("\nAfter htonl() \n") ; 
+	printf("x in hex : %x\n", x); 
+    	unsigned char *ptr = (char*)&x ; 
+    	printf("ptr = %x %x \n", ptr[2], ptr[3]) ;
+	
+	brodcast_mac[0]=0xff;
+    	brodcast_mac[1]=0xff;
+    	brodcast_mac[2]=0xff;
+    	brodcast_mac[3]=0xff;
+    	brodcast_mac[4]=0xff;
+    	brodcast_mac[5]=0xff;
+    	
+    	long x1 = htonl(btp_port_DENM) ;
+	unsigned char *ptr1 = (char*)&x1 ;
+	
+	x2 = htonl(x2) ;
+	unsigned char *ptr2 = (char*)&x2 ;  
+	 
+    	
+    	
+   p = (struct itsnet_btp_packet*)malloc(sizeof(struct itsnet_btp_packet));
+    
+    if(p == NULL) {
+        printf("erreur allocation \n");
+    } else  {
+    
+    	memset(p, 0, sizeof(struct itsnet_btp_packet));
+        
+        p->basic_header.itsnet_version_next_header = HI_NIBBLE(1);
+        p->basic_header.itsnet_version_next_header |= LO_NIBBLE(common_header);
+        p->basic_header.itsnet_lifetime=lt_base_10s;
+        p->basic_header.itsnet_rhl=0;
+        
+
+        p->common_header.itsnet_next_header =  HI_NIBBLE(BTP_B); /** 4bits common header next header */
+        p->common_header.itsnet_next_header |=  LO_NIBBLE(0); /** 4bits reserved must be set to zero */
+        p->common_header.itsnet_header_type_subtype =  HI_NIBBLE(itsnet_geobroadcast_id);
+        p->common_header.itsnet_header_type_subtype |= LO_NIBBLE(UNSPECIFIED);
+            
+        p->common_header.traffic_class = CLASS03;
+        p->common_header.flags = 0;
+        p->common_header.flags  =  Mobile << 7;
+        p->common_header.payload_lenght = (ptr2[3] << 8) | ptr2[2];
+        //p->common_header.payload_lenght = (ptr[3] << 8) | ptr[2];   
+        p->common_header.max_hop_limit = 0;
+        p->common_header.reserved= 0;
+        
+        /* remplissage du payload du geobroadcast */ 
+        
+        p->itsnet_geobroadcast_btp.sequence_number = 0x4 ;  
+        p->itsnet_geobroadcast_btp.reserved_1 = 0x3 ; 
+        p->itsnet_geobroadcast_btp.source_position_vector=pos ; 
+        p->itsnet_geobroadcast_btp.dest_latitude = 15 ; 
+        p->itsnet_geobroadcast_btp.dest_longitude = 10 ; 
+        p->itsnet_geobroadcast_btp.radius = 4; 
+        p->itsnet_geobroadcast_btp.distance_b = 5 ; 
+        p->itsnet_geobroadcast_btp.angle = 1 ; 
+        p->itsnet_geobroadcast_btp.reserved_2 = 2;
+        
+        /*p->payload.itsnet_geobroadcast_btp.sequence_number = 4 ;  
+        p->payload.itsnet_geobroadcast_btp.reserved_1 = 3 ; 
+        p->payload.itsnet_geobroadcast_btp.source_position_vector=pos ; 
+        p->payload.itsnet_geobroadcast_btp.dest_latitude = 15 ; 
+        p->payload.itsnet_geobroadcast_btp.dest_longitude = 10 ; 
+        p->payload.itsnet_geobroadcast_btp.radius = 4; 
+        p->payload.itsnet_geobroadcast_btp.distance_b = 5 ; 
+        p->payload.itsnet_geobroadcast_btp.angle = 0 ; 
+        p->payload.itsnet_geobroadcast_btp.reserved_2 = 0;*/
+        
+        //p->payload.itsnet_geobroadcast_btp.btp = m->payload.btp ; 
+        
+        /* remplissage du btp_pdu */ 
+                
+        /* remplir tous les champs du packets */
+        	
+        //p->btp.btp_header.source_port = 2002 ;
+        
+        
+        /*printf(" received message : \n") ; 
+        printf(" btp header : \n") ;*/  
+        
+        //p->btp = m->payload.btp ;
+        
+        //p->btp.btp_header = {(ptr1[3] << 8) | ptr1[2], 2}
+        
+        
+        printf("=============== DENM IN ITSNET ================= \n"); 
+	printf("=============== ITS PDU HEADER ====================== \n") ; 
+	printf("protocol version = %d | message id = %d | station id = ", m->payload.btp.payload.header.protocol_version, m->payload.btp.payload.header.message_id); 
+	for(int i = 0; i<8; i++) 
+		printf("%d \t", m->payload.btp.payload.header.station_id.id[i]) ; 
+	printf("\n") ; 
+	printf("============== PAYLOAD ============================== \n") ; 
+	printf("------------ management container ------------------ \n") ; 
+	printf("station type = %d | detection time = %d | reference time = %d | relevance distance = %d | relevance traffic direction = %d | validity duration = %d \n", m->payload.btp.payload.payload.management.station_type, m->payload.btp.payload.payload.management.detection_time, m->payload.btp.payload.payload.management.reference_time, m->payload.btp.payload.payload.management.relevance_distance, m->payload.btp.payload.payload.management.relevance_traffic_direction, m->payload.btp.payload.payload.management.validity_duration) ; 
+	printf("===================================================== \n");
+        
+        p->btp.btp_header.destination_port =  (ptr1[3] << 8) | ptr1[2];
+        p->btp.btp_header.destination_port_info = 258 ;
+        p->btp.payload.header.protocol_version = 3 ; 
+        p->btp.payload.header.message_id = 1 ; 
+         
+        //p->btp.payload.header.station_id = 1065800 ; 
+        //p->btp.payload.payload.management.action_id.originating_station_id = 5 ; 
+	p->btp.payload.payload.management.action_id.sequence_number = 1 ; 
+
+        gettimeofday(&t_emit, NULL);
+        //result = itsnet_geobroadcast_send(p);
+        printf("result = %d \n ", result) ; 
+        //printf("btp packet is sent \n") ;	
+        //itsnet_beacon_send_btp(p) ;
+        
+        /* afficher les champs reçus */ 
+        
+        //printf("btp source port : %d octets \n", m->payload.btp.btp_header.source_port ) ; 
+        
+        /*printf("taille du packet dans itsnet_listener:   %d octets \n", sizeof(itsnet_packet)) ;
+        
+        printf("taille de p : %d octets \n", sizeof(*p)) ;
+        
+        printf("taille de GBC packet + btp_pdu : %d octets \n", sizeof(struct itsnet_geobroadcast_btp_t) + sizeof(btp_pdu_t)) ;  
+        
+        //printf("taille des champs de p après remplissage : %d octets \n", sizeof(p->basic_header) + sizeof(p->common_header) + sizeof(p->payload.itsnet_geobroadcast_btp)) ;  
+        
+        printf("taille de : common_header + basic_header + itsnet_geobroadcast_btp : %d \n", sizeof(struct itsnet_common_header) + sizeof(struct itsnet_basic_header) + sizeof(struct itsnet_geobroadcast_btp_t )) ; 
+        
+        printf("taille du btp_pdu : %d octets \n", sizeof(btp_pdu_t)) ; 
+        
+        printf("taille du btp_pdu reçu : %d octets \n", sizeof(m->payload.btp)) ; 
+        
+        printf("taille du btp header dans le message : %d octets \n", sizeof(m->payload.btp.btp_header)) ;
+        
+        printf("taille du btp payload dans le message : %d octets \n", sizeof(m->payload.btp.payload)) ; 
+        
+        //printf("taille du btp length dans le message : %d octets \n", sizeof(m->payload.btp.payload_length)) ;
+        
+        printf("taille du btp pdu dans le message : header + payload + payload_length %d \n", sizeof(m->payload)) ;
+        
+        printf(" ******************************* \n") ; 
+        
+        printf("taille du btp header : %d octets \n", sizeof(btp_header_t)); 
+        
+        printf("taille du paylod : %d octets  \n", sizeof(DENM_t)) ;
+        
+        printf("taille du packet denm %d \n", sizeof(DENM_t)) ;
+        
+        printf("taille du btp pdu : %d \n ", sizeof(btp_pdu_t)) ; */
+        
+        printf("taille du btp_pdu de type B : %d \n", sizeof (btp_b_pdu_t)) ; 
+          
+        result = itsnet_btp_packet_send(p, brodcast_mac);
+	//result = itsnet_packet_send(p, brodcast_mac);
+          
+        trace_emit_packet(t_emit);
+        
+    
+        
+        	
+        return result ;  
+        
+}
+
 }
 
 /**
@@ -634,8 +848,7 @@ int itsnet_geobroadcast_indication_send(struct itsnet_packet* p)
 
     memcpy(m->payload.itsnet_geobroadcast_ind.data, p->payload.itsnet_geobroadcast.payload, MES_PAYLOAD_LEN);
 
-    m->payload.itsnet_geobroadcast_ind.source_node_pos.node_id =
-        p->payload.itsnet_geobroadcast.source_position_vector.node_id;
+    m->payload.itsnet_geobroadcast_ind.source_node_pos.node_id = p->payload.itsnet_geobroadcast.source_position_vector.node_id;
     m->payload.itsnet_geobroadcast_ind.forwarder_node_pos.node_id = p->payload.itsnet_geobroadcast.forwarder_position_vector.node_id;
     m->payload.itsnet_geobroadcast_ind.source_node_pos = p->payload.itsnet_geobroadcast.source_position_vector;
     m->payload.itsnet_geobroadcast_ind.forwarder_node_pos = p->payload.itsnet_geobroadcast.forwarder_position_vector;
@@ -669,15 +882,21 @@ int itsnet_configure_security_param_request_receive(struct message* m)
     return 0;
 }
 
+
+
 /**
  * socket_recv
  * @param struct message *m
  * @return void
  */
-static void socket_recv(struct message* m)
+void socket_recv(struct message* m)
 {
 
     int result = 1;
+    
+    printf("aid =%d \n", m->msg_hdr.aid) ; 
+    //printf("station type before switch = %d \n", m->payload.btp.payload.payload.management.station_type) ; 
+    printf("detection time before switch = %d \n", m->payload.btp.payload.payload.management.detection_time) ; 
 
     switch(m->msg_hdr.aid) {
     case itsnet_configure_node_id:
@@ -720,6 +939,12 @@ static void socket_recv(struct message* m)
         result = itsnet_configure_security_param_request_receive(m);
         // printf("itsnet_configure_security_param \n");
         break;
+    case itsnet_btp_request: 
+    	result = itsnet_btp_request_receive(m) ;
+    	//result = itsnet_geobroadcast_request_receive(m) ;
+    	printf("station type in socket_recv = %d \n", m->payload.btp.payload.payload.management.station_type) ;
+    	printf("itsnet_btp_request \n") ;
+    	break ;   
     default:
         printf("unknown type\n");
         break;
@@ -757,6 +982,8 @@ int server(int client_socket)
         msg = (struct message*)malloc(sizeof(message));
         memset(msg,0,sizeof(message));
         recv(client_socket, msg, sizeof(message), 0);
+        
+  
         socket_recv(msg);
     }
     
@@ -767,7 +994,7 @@ int server(int client_socket)
  * @param void
  * @return void
  */
-static void* listener(void* arg)
+void* listener(void* arg)
 {
     int s, s2, len;
     unsigned int t;

@@ -1,12 +1,12 @@
 /***************************************************************************
  *   ITSNET  Intelligent Transport System networking Stack                 *
- * 									   *
- ** Copyright(C)2010 ESPRIT											   *
- * 	        "École supérieure privée d'ingénierie et de technologie"       *
- *                                                                         *
+ * 									     *
+ ** Copyright(C)2010 ESPRIT							
+ * 	        "École supérieure privée d'ingénierie et de technologie"   
+ *                                                                         
  *   barghich@gmail.com                                                    *
  *   anouar.chemek@gmail.com                                               *
- *  							                                           *
+ *  							                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
@@ -46,6 +46,7 @@
 #include <unistd.h>
 
 #include "beaconing.h"
+#include "geo_broadcast.h" 
 #include "dll_sap.h"
 #include "itsnet.h"
 #include "itsnet_listener.h"
@@ -101,7 +102,7 @@ int itsnet_main(int argc, char** argv)
                 }
     */
 
-    itsnet_init_conf();
+    itsnet_init_conf(); 
 
     return 0;
 }
@@ -112,6 +113,61 @@ int itsnet_main(int argc, char** argv)
 void itsnet_init_conf()
 {
     set_ego_node_id(NodeId_parse());
-
-    itsnet_beacon_send();
+    
+    //itsnet_beacon_send();
+    
+    
+    // préparer le packet 
+    /*struct itsnet_position_vector pos;
+    static struct timeval t_emit;
+    pos = get_position_vector() ;
+    int result ;  
+    uint8_t brodcast_mac[MAX_LLA_LEN];
+    brodcast_mac[0]=0xff;
+    brodcast_mac[1]=0xff;
+    brodcast_mac[2]=0xff;
+    brodcast_mac[3]=0xff;
+    brodcast_mac[4]=0xff;
+    brodcast_mac[5]=0xff;
+    //memcpy((uint8_t*)brodcast_mac, (uint8_t*)BroadcastMac_parse()->address, MAX_LLA_LEN);
+ 
+    struct itsnet_packet *p ;
+    p = (itsnet_packet*)malloc(sizeof(itsnet_packet));
+    
+    
+     if(p == NULL) {
+        printf("erreur allocation \n");
+        
+     }
+     else {
+     
+     	memset(p, 0, sizeof(itsnet_packet));
+      	
+        p->basic_header.itsnet_version_next_header = HI_NIBBLE(1);
+        p->basic_header.itsnet_version_next_header |= LO_NIBBLE(common_header);
+        p->basic_header.itsnet_lifetime=lt_base_10s;
+        p->basic_header.itsnet_rhl=10;
+        
+        p->common_header.itsnet_header_type_subtype = HI_NIBBLE(itsnet_geobroadcast_id);
+        p->common_header.itsnet_header_type_subtype |= LO_NIBBLE(0);
+        p->common_header.traffic_class = CLASS01;
+        p->common_header.flags = 0;
+        p->common_header.flags = Mobile << 7;
+        //p->common_header.payload_lenght = htons(1514);
+        //p->common_header.payload_lenght = htons(sizeof(*p));
+        p->common_header.payload_lenght = 0;
+        p->common_header.max_hop_limit = 255;
+        p->common_header.reserved=0;
+        p->common_header.itsnet_next_header = HI_NIBBLE(BTP_B);
+        p->common_header.itsnet_next_header |= LO_NIBBLE(0);
+        
+        p->payload.itsnet_geobroadcast.forwarder_position_vector = pos;
+        p->payload.itsnet_geobroadcast.forwarder_position_vector.node_id = *(get_ego_node_id()) ;
+        
+        result = itsnet_geobroadcast_send(p) ; 
+        
+        
+     } */ 
+     
+       
 }

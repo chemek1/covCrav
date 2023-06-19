@@ -1,6 +1,9 @@
 #ifndef __FACILITIES_
 #define __FACILITIES_
 
+
+
+
 #include <time.h>
 #include <stdbool.h> 
 #include <stdio.h>
@@ -12,8 +15,14 @@
 #include <unistd.h> 
 //#include <ntp.h>
 #include <netinet/in.h>
-#include "itsnet_btp.h" 
-#include "itsnet_btp.h" 
+//#include "itsnet_btp.h" 
+
+#include "itsnet_header.h" 
+#include "time_functions.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define MAX_LLA_LEN 8
 #define NODE_ID_LEN 8
@@ -62,13 +71,7 @@ typedef uint8_t cause_code_type_t;              /* cause_code_type */
 
 typedef uint8_t sub_cause_code_type_t;          /* SubCauseCodeType */
 
-typedef uint32_t driving_lanes_status_t ; 
-
-typedef uint8_t itsnet_time_stamp ; 
-
-typedef uint8_t itsnet_speed ; 
-
-typedef uint8_t itsnet_heading ; 
+typedef uint32_t driving_lanes_status_t ;   
 
 
 
@@ -100,10 +103,6 @@ typedef int8_t temperature_t;                   /* Temperature */
 
 typedef int8_t lane_position_t;                 /* lane position of the event position*/
 
-typedef uint8_t itsnet_latitude ; 
-
-typedef uint8_t itsnet_longitude ; 
-
 typedef uint16_t event_delta_time_t;            /* event delta time */
 
 typedef uint32_t position_of_occupants_t;       /* position_of_occupants */
@@ -116,38 +115,37 @@ typedef uint32_t energy_storage_type_t ;
 
 typedef uint8_t positioning_solution_type_t;  /* positioning_solution_type */
 
+typedef uint8_t vehicle_length_value_t ; 
 
+typedef uint8_t vehicle_width_t ;
+ 
+typedef uint8_t longitudinal_acceleration_value_t ;
+ 
+typedef uint8_t logitudinal_acceleration_confidence_t ;
+ 
+typedef uint8_t curvature_value_t ;
 
+typedef uint8_t yaw_rate_value_t ;  
 
+typedef uint8_t yaw_rate_confidence_t ; 
 
+typedef unsigned char acceleration_control_t ;
 
+typedef uint8_t lateral_acceleration_t ;
 
+typedef uint8_t vertical_acceleration_t ;
 
-// à enlever 
-typedef enum btp_port
- {
-     btp_Port_UNSPECIFIED = 0,
-     btp_port_CAM = 2001,
-     btp_port_DENM = 2002,
-     btp_port_MAPEM = 2003,
-     btp_port_SPATEM = 2004,
-     btp_port_SAEM = 2005,
-     btp_port_IVIM = 2006,
-     btp_port_SREM = 2007,
-     btp_port_SSEM = 2008,
-     btp_port_CPM = 2009,
-     btp_port_EVCSN = 2010,
-     btp_port_TPG = 2011,
-     btp_port_EV_RSR = 2012,
-     btp_port_RTCMEM = 2013,
-     btp_port_CTLM = 2014,
-     btp_port_CRLM = 2015,
-     btp_port_EC_AT = 2016,
-     btp_port_MCDM = 2017,
-     btp_port_VAM = 2018,
-     btp_port_IMZM = 2019
- } e_btp_port;
+typedef uint8_t performance_class_t ; 
 
+typedef uint8_t expiry_time_t ;
+
+typedef uint8_t protected_zone_latitude_t ;
+
+typedef uint8_t protected_zone_longitude_t ; 
+
+typedef uint16_t generation_delta_time_t ;
+
+typedef unsigned char exterior_lights_t ; 
 
 
 
@@ -189,7 +187,7 @@ typedef enum validity_duration {
 	validity_duration_oneSecondAfterDetection	= 1
 } e_validity_duration;
 
-typedef enum termination { termination_is_cancellation = 1, Termination_is_negation = 2 } e_termination;
+typedef enum termination { termination_is_cancellation = 0, Termination_is_negation = 1 } e_termination;
 
 
 typedef enum temperature {
@@ -238,6 +236,7 @@ typedef enum relevance_distance {
 	relevance_distance_lessThan10km		= 6,
 	relevance_distance_over10km		= 7
 } e_relevance_distance;
+
 
 
 typedef enum adverse_weather_condition_PrecipitationSubCauseCode {
@@ -310,7 +309,6 @@ typedef enum cause_code_type {
 	cause_code_type_signalViolation					= 98,
 	cause_code_type_dangerousSituation				= 99
 } e_cause_code_type;
-
 
 
 typedef enum path_delta_time { path_delta_time_tenMilliSecondsInPast = 1 } e_path_delta_time;
@@ -404,7 +402,7 @@ typedef enum sub_cause_code_stationary_vehicle {
 
 typedef enum sub_cause_code_wrong_way_driving {
 
-	unavailable = 0, 
+	sub_cause_code_wrong_way_unavailable = 0, 
 	vehicle_driving_in_wrong_lane = 1, 
 	vehicle_driving_in_wrong_way_direction = 2, 
 
@@ -440,22 +438,72 @@ typedef enum stationary_since {
 } e_stationary_since ; 
 
 
-typedef enum application_request_type {
 
-	AppDENM_trigger = 0, 
-	AppDENM_update, 
-	AppDENM_termination, 
 
-} application_request_type_id ;
-
-typedef enum denm_state {
-	ACTIVE = 0, 
+typedef enum denm_transmitted_state {
+	isACTIVE = 0, 
 	isCancellation, 
 	isNegation
 	
-} e_denm_state ; 
+} e_denm_transmitted_state ;
 
-typedef struct dangerous_goods_basic {
+typedef enum denm_received_state {
+	ACTIVE = 0, 
+	CANCELLED, 
+	NEGATED
+	
+} e_denm_received_state ;  
+
+
+typedef enum drive_direction {
+	forward = 0, 
+	backward,
+	drive_direction_unavailable 
+
+} e_drive_direction ; 
+
+
+
+typedef enum vehicle_length_confidence_indication {
+	no_traiter_present = 0 , 
+	traiter_present_with_known_length = 1 , 
+	traiter_present_with_unkown_length = 2 ,
+	traiter_presence_is_unkown = 3 ,
+	vehicle_length_confidence_indication_unavailable = 4
+
+} e_vehicle_length_confidence_indication ; 
+
+
+typedef enum curvature_confidence {
+	one_per_meter_0_00002 = 0, 
+	one_per_meter_0_0001 = 1,
+	one_per_meter_0_0005 = 2,
+	one_per_meter_0_002 = 3, 
+	one_per_meter_0_01 = 4,
+	one_per_meter_0_1 = 5,
+	out_of_range = 6, 
+	curvature_confidence_unavailable = 7
+	
+} e_curvature_confidence;
+
+typedef enum curvature_calculation_mode {
+	yaw_rate_used = 0,
+	yaw_rate_not_used,
+	curvature_calculation_mode_unavailable = 2 
+
+} e_curvature_calculation_mode ; 
+
+
+typedef enum protected_zone_type {
+	cen_dsrc_trolling = 0 , 
+} e_protected_zone_type ; 
+
+
+
+ 
+
+
+typedef enum dangerous_goods_basic {
 
 	explosives1 = 0, 
 	explosives2 = 1, 
@@ -481,25 +529,33 @@ typedef struct dangerous_goods_basic {
 } e_dangerous_goods_basic ; 
 
 
+typedef enum vehicle_role {
+	unspecified = 0, 
+	public_transport = 1,
+	special_transport = 2,
+	dangerous_goods = 3,
+	road_work = 4, 
+	rescue = 5,
+	emergency = 6, 
+	safety_car = 7, 
+	agriculture = 8, 
+	commercial = 9, 
+	military = 10, 
+	road_operator = 11, 
+	taxi = 12,
+	reserved1 = 13,
+	reserved2= 14, 
+	reserved3 = 15,  
+
+} e_vehicle_role ; 
 
 
 
-struct itsnet_node_id {
-    uint8_t id[NODE_ID_LEN];
-};
-typedef struct itsnet_node_id itsnet_node_id;
 
 
-struct itsnet_position_vector {
-    itsnet_node_id node_id;
-    itsnet_time_stamp 
-        time_stamp; /** UTC time in seconds, when the GPS data was calculated,NOT the time this message was generated */
-    itsnet_latitude latitude;   /** the latitude of the global position in 1/8 microdegree */
-    itsnet_longitude longitude; /** the longitude of the global position in 1/8 microdegree*/
-    itsnet_speed speed;         /** current speed in 0.01 meters per second*/
-    itsnet_heading heading;     /** current curse in 0.005493247 degrees*/
-};
-typedef struct itsnet_position_vector itsnet_position_vector;
+
+
+
 
 
 struct list_head {
@@ -514,15 +570,202 @@ typedef struct closed_lanes {
 } closed_lanes_t ; 
 
 typedef struct action_id {
-	itsnet_node_id originating_station_id;
+	itsnet_node_id node_id;
 	sequence_number_t sequence_number;
 } action_id_t;
 
 
 
+typedef struct delta_reference_position {
+	int32_t delta_latitude;
+	int32_t delta_longitude;
+	int16_t deltaAltitude;
+}delta_reference_position_t;
+
+
+
+/*
+ * DF_EventPoint as defined in ETSI TS 102 894-2 V1.2.1 clause A.110.
+ * */
+typedef struct event_point {
+	delta_reference_position_t event_position;
+	event_delta_time_t event_delta_time;
+	information_quality_t information_quality;
+} event_point_t;
+
+
+/*DF_EventHistory as defined in ETSI TS 102 894-2 V1.2.1.
+ * */
+typedef struct event_history {
+	event_point_t event_pt;
+	struct list_head list;
+} event_history_t;
+
+
+
+typedef struct situation_container {
+	information_quality_t information_quality;
+	e_cause_code_type event_type;
+	e_cause_code_type linked_cause /* OPTIONAL */;
+	event_history_t event_history /* OPTIONAL */;
+} situation_container_t;
+
+
+typedef struct speed {
+	speed_value_t speed_value;
+	speed_confidence_t speed_confidence;
+} speed_t;
+
+typedef struct heading {
+	heading_value_t heading_value;
+	heading_confidence_t heading_confidence;
+} heading_t;
+
+/*
+ * DF_PathPoint as defined in ETSI TS 102 894-2 V1.2.1
+ * */
+typedef struct path_point {
+	delta_reference_position_t path_position;
+	path_delta_time_t path_delta_time;
+} path_point_t;
+
+typedef struct path_history {
+	path_point_t path_pt;
+	struct list_head list;
+} path_history_t;
+
+typedef struct traces {
+	uint8_t count;
+	path_history_t values[7];
+} traces_t;
+
+typedef struct location_container {
+	struct speed event_speed /* OPTIONAL */;
+	struct heading event_position_heading /* OPTIONAL */;
+	traces_t traces;
+	e_road_type roadType /* OPTIONAL */;
+} location_container_t;
+
+typedef struct position_of_pillars {
+	uint8_t count;
+	uint8_t values[3];
+} position_of_pillars_t;
+
+
+
+
+typedef struct impact_reduction_container {
+	uint8_t height_lon_carr_left;
+	uint8_t height_lon_carr_right;
+	uint8_t pos_lon_carr_left;
+	uint8_t pos_lon_carr_right;
+	position_of_pillars_t position_of_pillars;
+	uint8_t pos_cent_mass;
+	uint8_t wheel_base_vehicle;
+	uint8_t turning_radius;
+	uint8_t pos_front_ax;
+	position_of_occupants_t position_of_occupants;
+	uint16_t vehicle_mass;
+	e_request_response_indication request_response_indication;
+} impact_reduction_container_t;
+
+
+typedef struct restricted_types {
+
+	uint8_t count;
+	e_station_type station_types[16];
+
+
+} restricted_types_t ; 
+
+
+typedef struct itinerary_path {
+
+	uint8_t count ; 
+	itsnet_position_vector references[40] ; 
+	
+
+} itinerary_path_t ; 
+
+
+typedef struct reference_denms {
+
+	uint8_t count ; 
+	action_id_t values[8] ;
+	
+
+} reference_denms_t ;
+
+typedef struct roadworks_container_extended {
+
+	light_bar_siren_in_use_t light_bar_siren ; /*OPTIONAL*/
+	closed_lanes_t closedLanes ; /*OPTIONAL*//**/
+	restricted_types_t restriction ;  /*OPTIONAL*//**/
+	uint8_t speed_limit ; 
+	e_cause_code_type incident_indication ; /*OPTIONAL*/ 
+	itinerary_path_t recommended_path ; /*OPTIONAL*/
+	delta_reference_position_t starting_point_speed_limit ; /*OPTIONAL*/
+	e_traffic_rule traffic_flow_rule ; /*OPTIONAL*/ 
+	reference_denms_t denms_reference ; /*OPTIONAL*//**/ 		
+} roadworks_container_extended_t ; 
+
+typedef struct dangerous_goods_extended {
+
+	e_dangerous_goods_basic dangerous_basic ; 
+	int unNumber ; 
+	bool elevated_temperature ; 
+	bool tunnels_restricted ; 
+	bool limited_quantity ; 
+	char* emergency_action_code ; /*OPTIONAL*/
+	char* phone_number ; /*OPTIONAL*/ 
+	unsigned char company_name ; /*OPTIONAL*/
+	
+
+} dangerous_goods_extended_t ; 
+
+
+typedef struct vehicle_identification {
+	
+	char* wmi_number ; 
+	char* vds ; 
+	
+} vehicle_identification_t ; 
+
+
+typedef struct stationary_vehicle_container { 
+	e_stationary_since stationary_since ; /*OPTIONAL*/ 
+	e_cause_code_type stationary_cause ;  /*OPTIONAL*/
+	dangerous_goods_extended_t carrying_dangerous_goods ; /*OPTIONAL*/ 
+	uint8_t number_of_occupants; /*OPTIONAL*/
+	vehicle_identification_t identification ; /*OPTIONAL*/
+	energy_storage_type_t energy_storage ; /*OPTIONAL*/ 
+	 
+}stationary_vehicle_container_t;
+
+/*
+ * AlacarteContainer as defined in ETSI EN 302 637-3 V1.2.2.
+ * */
+typedef struct alacarte_container {
+	lane_position_t lane_position;
+	impact_reduction_container_t impact_reduction;
+	temperature_t external_temperature;
+	roadworks_container_extended_t road_works; 
+	positioning_solution_type_t positioning_solution;
+	stationary_vehicle_container_t stationary_vehicle_container;
+} alacarte_container_t;
+
+
+typedef struct event_relevance_area {
+	e_relevance_distance relevance_distance ;
+	e_relevance_traffic_direction relevance_traffic_direction ;  
+	
+} event_relevance_area_t ; 
+
+
+
 typedef struct transmission_trigger_params {
 
-	struct ntptimeval detection_time ; 
+	struct timeval detection_time ; 
 	itsnet_position_vector event_position ; 
 	validity_duration_t validity_duration ; 
 	int repetition_duration ; 
@@ -533,22 +776,22 @@ typedef struct transmission_trigger_params {
 	alacarte_container_t alacarte_informations ; 
 	event_relevance_area_t relevance_area ; 
 	/* destination_area */ 
-	itsnet_traffic_class traffic_class ; 
-	action_id_t action_id ; 
+	itsnet_traffic_class traffic_class ;  
 	
 } transmission_trigger_params_t ; 
 
 
 typedef struct transmission_update_params {
 	action_id_t action_id ; 
-	itsnet_time_stamp detection_time ; 
+	struct timeval detection_time ; 
 	itsnet_position_vector event_position ; 
 	validity_duration_t validity_duration ; 
 	int repetition_duration ; 
 	transmission_interval_t transmission_interval ; 
 	int repetition_interval ; 
 	situation_container_t situation_informations ; 
-	location_container_t location_container ;
+	location_container_t location_informations ;
+	alacarte_container_t alacarte_informations ; 
 	event_relevance_area_t relevance_area ; 
 	/* destination area */ 
 	itsnet_traffic_class traffic_class ; 
@@ -557,7 +800,7 @@ typedef struct transmission_update_params {
 
 typedef struct transmssion_termination_params {
 	action_id_t action_id ;
-	itsnet_time_stamp detection_time ; 
+	struct timeval detection_time ; 
 	validity_duration_t validity_duration ; 
 	int repetition_duration ; 
 	transmission_interval_t transmission_interval ; 
@@ -584,74 +827,8 @@ typedef struct transmission_params {
 
 
 
-/*
- * DF_DeltaReferencePosition as defined in ETSI TS 102 894-2 V1.2.1
- * */
-typedef struct delta_reference_position {
-	int32_t delta_latitude;
-	int32_t delta_longitude;
-	int16_t deltaAltitude;
-}delta_reference_position_t;
-
-/*
- * DF_EventPoint as defined in ETSI TS 102 894-2 V1.2.1 clause A.110.
- * */
-typedef struct event_point {
-	delta_reference_position_t event_position;
-	event_delta_time_t event_delta_time;
-	information_quality_t information_quality;
-} event_point_t;
 
 
-/*DF_EventHistory as defined in ETSI TS 102 894-2 V1.2.1.
- * */
-typedef struct event_history {
-	event_point_t event_pt;
-	struct list_head list;
-} event_history_t;
-
-/*
- * DF_PathPoint as defined in ETSI TS 102 894-2 V1.2.1
- * */
-typedef struct path_point {
-	delta_reference_position_t path_position;
-	path_delta_time_t path_delta_time;
-} path_point_t;
-
-/*
- * DF_PathHistory as defined in ETSI TS 102 894-2 V1.2.1. Size of the Array shall be 23
-   as defined in ETSI EN 302 637-2 V1.3.2.
- * */
-typedef struct path_history {
-	path_point_t path_pt;
-	struct list_head list;
-} path_history_t;
-
-/*
- * DF_Traces as defined in ETSI TS 102 894-2 V1.2.1. Size of the Array shall be 7.
- * */
-typedef struct traces {
-	uint8_t count;
-	path_history_t values[7];
-} traces_t;
-
-typedef struct heading {
-	heading_value_t heading_value;
-	heading_confidence_t heading_confidence;
-} heading_t;
-
-typedef struct speed {
-	speed_value_t speed_value;
-	speed_confidence_t speed_confidence;
-} speed_t;
-
-/*
- * DF_ActionID as defined in ETSI TS 102 894-2 V1.2.1.
- * */
-typedef struct action_id {
-	itsnet_node_id originating_station_id;
-	sequence_number_t sequence_number;
-} action_id_t;
 
 
 /* CauseCode */
@@ -663,10 +840,7 @@ typedef struct cause_code {
 /*
  * DF_PositionOfPillars as defined in ETSI TS 102 894-2 V1.2.1
  * */
-typedef struct position_of_pillars {
-	uint8_t count;
-	uint8_t values[3];
-} position_of_pillars_t;
+
 
 typedef struct road_works_container_extended { /* TODO*/
 	/* TODO */
@@ -674,148 +848,14 @@ typedef struct road_works_container_extended { /* TODO*/
 } road_works_container_extended_t;
 
 
-typedef struct event_relevance_area {
-	e_relevance_distance relevance_distance ;
-	e_relevance_traffic_direction_t relevance_traffic_direction ;  
-	
-} event_relevance_area_t ; 
-
-
-
-
-
-typedef struct dangerous_goods_extended {
-
-	e_dangerous_goods_basic dangerous_basic ; 
-	int unNumber ; 
-	bool elevated_temperature ; 
-	bool tunnels_restricted ; 
-	bool limited_quantity ; 
-	char* emergency_action_code ; /*OPTIONAL*/
-	char* phone_number ; /*OPTIONAL*/ 
-	unsigned char company_name ; /*OPTIONAL*/
-	
-
-} dangerous_goods_extended_t ; 
-
-
-typedef struct vehicle_identification {
-	
-	char* wmi_number ; 
-	char* vds ; 
-	
-} vehicle_identification_t ; 
-
-
-
-
-typedef struct stationary_vehicle_container { 
-	e_stationary_since stationary_since ; /*OPTIONAL*/ 
-	e_cause_code_type stationary_cause ;  /*OPTIONAL*/
-	dangerous_goods_extended_t carrying_dangerous_goods ; /*OPTIONAL*/ 
-	uint8_t number_of_occupants; /*OPTIONAL*/
-	vehicle_identification_t identification ; /*OPTIONAL*/
-	energy_storage_type_t energy_storage ; /*OPTIONAL*/ 
-	 
-}stationary_vehicle_container_t;
-
-
-typedef struct impact_reduction_container {
-	uint8_t height_lon_carr_left;
-	uint8_t height_lon_carr_right;
-	uint8_t pos_lon_carr_left;
-	uint8_t pos_lon_carr_right;
-	position_of_pillars_t position_of_pillars;
-	uint8_t pos_cent_mass;
-	uint8_t wheel_base_vehicle;
-	uint8_t turning_radius;
-	uint8_t pos_front_ax;
-	position_of_occupants_t position_of_occupants;
-	uint16_t vehicle_mass;
-	e_request_response_indication request_response_indication;
-} impact_reduction_container_t;
-
-
-
-
 /*
  * SituationContainer as defined in ETSI EN 302 637-3 V1.2.2.
  * */
-typedef struct situation_container {
-	information_quality_t information_quality;
-	e_cause_code_type event_type;
-	e_cause_code_type linked_cause /* OPTIONAL */;
-	event_history_t event_history /* OPTIONAL */;
-} situation_container_t;
+
 
 /*
  * LocationContainer as defined in ETSI EN 302 637-3 V1.2.2.
  * */
-typedef struct location_container {
-	struct speed event_speed /* OPTIONAL */;
-	struct heading event_position_heading /* OPTIONAL */;
-	traces_t traces;
-	e_road_type roadType /* OPTIONAL */;
-} location_container_t;
-
-
-
-typedef struct restricted_types {
-
-	uint8_t count;
-	e_station_type station_types[16];
-
-
-} restricted_types_t ; 
-
-typedef struct itinerary_path {
-
-	uint8_t count ; 
-	itsnet_position_vector references[40] ; 
-	
-
-} itinerary_path_t ; 
-
-
-
-
-typedef struct reference_denms {
-
-	uint8_t count ; 
-	action_id_t values[8]
-	
-
-} reference_denms_t ;
-
-
-typedef struct roadworks_container_extended {
-
-	light_bar_siren_in_use_t light_bar_siren ; /*OPTIONAL*/
-	closed_lanes_t closedLanes ; /*OPTIONAL*//**/
-	restricted_types_t restriction ;  /*OPTIONAL*//**/
-	uint8_t speed_limit ; 
-	e_cause_code_type incident_indication ; /*OPTIONAL*/ 
-	itinerary_path_t recommended_path ; /*OPTIONAL*/
-	delta_reference_position_t starting_point_speed_limit ; /*OPTIONAL*/
-	e_traffic_rule traffic_flow_rule ; /*OPTIONAL*/ 
-	reference_denms_t denms_reference ; /*OPTIONAL*//**/ 
-		
-} roadworks_container_extended_t ; 
-
-
-
-/*
- * AlacarteContainer as defined in ETSI EN 302 637-3 V1.2.2.
- * */
-typedef struct alacarte_container {
-	lane_position_t lane_position;
-	impact_reduction_container_t impact_reduction;
-	temperature_t external_temperature;
-	roadworks_container_extended_t road_works; 
-	positioning_solution_type_t positioning_solution;
-	stationary_vehicle_container_t stationary_vehicle_container;
-} alacarte_container_t;
-
 
 typedef struct management_container {
 	action_id_t action_id;
@@ -835,28 +875,28 @@ typedef struct decentralized_environmental_notification_message {
 	management_t management;
 	situation_container_t situation /* OPTIONAL */;
 	location_container_t location /* OPTIONAL */;
-	alacarte_container_t alacarte /* OPTIONAL */;
+	//alacarte_container_t alacarte /* OPTIONAL */;
 } denm_t;
 
 
 /* transmit messages table */
 
-typedef struct message {
+typedef struct transmitted_message {
 
 	itsnet_node_id node_id ; 
 	int sequence_number ; 
-	e_denm_state state ; 
+	e_denm_transmitted_state state ; 
 	
-}message_t ; 
+}transmitted_message_t ; 
 
 
 typedef struct denm_transmission_messages {
 	int count ; 
-	message_t* denm_messages[1000] ; 
+	transmitted_message_t* denm_messages[1000] ; 
 
 } denm_transmission_messages_t ; 
 
-denm_transmission_messages_t* denm_tx_messages ;  
+ 
 
 /* received messages table */ 
 
@@ -866,16 +906,24 @@ typedef struct received_message {
 	itsnet_time_stamp reference_time ;
 	e_termination termination ; 
 	itsnet_time_stamp detection_time ; 
+	e_denm_received_state state ; 
 		
 } received_message_t ; 
+
+
+
+
+
+
+
 
 typedef struct denm_received_messages {
 	
 	int count ; 
-	received_messages_t* denm_messages[1000] ; 
+	received_message_t* denm_messages[1000] ; 
 } denm_received_messages_t ; 
 
-denm_received_messages_t denm_rx_messages ;  
+//denm_received_messages_t* denm_rx_messages ;  
 
 
 /* ItsPduHeader */
@@ -892,11 +940,187 @@ typedef struct DENM {
 	denm_t payload;
 } DENM_t;
 
-denm_t* encode_denm(int signal, action_id_t id, transmission_interval_t transmission_interval) ; 
-void decode_denm(DENM_t* packet, denm_t* payload, int *weather, int *seq_nb);
 
-void denm_transmission_management(int signal, application_request_type_id request_id, transmission_params_t* app_params) ; 
-denm_t* denm_reception_management(DENM_t* packet);
+typedef struct vehicle_length {
+	vehicle_length_value_t length_value ; 
+	e_vehicle_length_confidence_indication length_confidence_indication ; 
 
+
+} vehicle_length_t ; 
+
+typedef struct longitudinal_acceleration {
+	longitudinal_acceleration_value_t longitudinal_acceleration_value ;  
+	logitudinal_acceleration_confidence_t acceleration_confidence ; 
+
+
+} longitudinal_acceleration_t ;
+
+
+typedef struct curvature {
+	curvature_value_t curv_value ; 
+	e_curvature_confidence curv_confidence ;
+	 
+} curvature_t ; 
+ 
+
+typedef struct yaw_rate {
+	yaw_rate_value_t rate_value ;
+	yaw_rate_confidence_t rate_confidence ; 
+
+} yaw_rate_t ; 
+
+typedef struct steering_wheel_angle {
+
+} steering_wheel_angle_t ; 
+
+typedef struct cen_dsrc_tolling_zone {
+
+} cen_dsrc_tolling_zone_t ; 
+
+
+
+typedef struct basic_vehicle_container_high_frequency {
+	heading_t vehicle_heading ; 
+	speed_t vehicle_speed ; 
+	e_drive_direction direction ; 
+	vehicle_length_t length ; 
+	vehicle_width_t width ;
+	longitudinal_acceleration_t long_acceleration ; 
+	curvature_t curv ; 
+	e_curvature_calculation_mode curv_calculation ; 
+	yaw_rate_t rate ; 
+	acceleration_control_t ctrl_acceleration ; /*OPTIONAL*/
+	lane_position_t lane_pos ; /*OPTIONAL*/
+	steering_wheel_angle_t steering_angle ;  /*OPTIONAL*/
+	lateral_acceleration_t lat_acceleration ; /*OPTIONAL*/  
+	vertical_acceleration_t vert_acceleration ; /*OPTIONAL*/
+	performance_class_t performance ; /*OPTIONAL*/ 
+	cen_dsrc_tolling_zone_t tolling_zone ; /*OPTIONAL*/ 
+	
+
+} basic_vehicle_container_high_frequency_t ;
+
+
+
+typedef struct basic_container {
+	e_station_type station_type ; 
+	itsnet_position_vector reference_position ; 
+	
+} basic_container_t ;
+
+
+typedef struct protected_zone_radius {
+
+
+} protected_zone_radius_t ; 
+
+typedef struct protected_zone_id {
+
+} protected_zone_id_t ;
+
+
+typedef struct protected_communication_zone {
+	e_protected_zone_type zone_type ; 
+	expiry_time_t time_stamp_its ;
+	protected_zone_latitude_t latitude ;
+	protected_zone_longitude_t longitude ; 
+	protected_zone_radius_t radius ; /*OPTIONAL*/
+	protected_zone_id_t id ; /*OPTIONAl*/ 
+
+} protected_communication_zone_t ; 
+
+
+
+typedef struct protected_communication_zones_rsu {
+	protected_communication_zone_t comm_zone ; 
+
+} protected_communication_zones_rsu_t ; 
+
+typedef struct rsu_container_high_frequency {
+	protected_communication_zones_rsu_t comm_zones_rsu ;
+
+} rsu_container_high_frequency_t ; 
+
+
+typedef struct high_frequency_container {
+	union {
+		basic_vehicle_container_high_frequency_t basic_vehicle_high_frequency ;  
+		rsu_container_high_frequency_t rsu_high_frequency ;	
+	} high_frequency ; 
+
+} high_frequency_container_t ; 
+
+
+
+typedef struct basic_vehicle_container_low_frequency {
+
+	e_vehicle_role role ; 
+	exterior_lights_t extr_lights ;
+	path_history_t path_hist ;  
+
+} basic_vehicle_container_low_frequency_t ; 
+
+
+typedef struct low_frequency_container {
+	union {
+		basic_vehicle_container_low_frequency_t basic_container_low_frequency ; 
+	} basic_low_frequency ;
+
+} low_frequency_container_t ;
+
+typedef struct special_vehicle_container {
+
+
+} special_vehicle_container_t ;
+
+typedef struct cooperative_awarness_message {
+	generation_delta_time_t generation_delta_time ; 
+	basic_container_t basic ; 
+	high_frequency_container_t high_frequency_container ; 
+	low_frequency_container_t low_frequency ; /*OPTIONAL*/
+	special_vehicle_container_t special_vehicle ; /*OPTIONAL*/ 
+
+} cam_t ; 
+
+
+typedef struct CAM {
+	its_pdu_header_t header ; 
+	cam_t paylaod ; 
+} CAM_t ;
+
+
+
+
+extern transmitted_message_t messages ; 
+
+extern transmitted_message_t* const denm_messages ; 
+
+extern received_message_t rx_messages ; 
+
+extern received_message_t* const denm_rx_messages ; 
+
+
+
+
+
+
+DENM_t* encode_denm(application_request_type_id request_id, transmission_params_t* app_params) ; 
+denm_t* decode_denm(DENM_t* packet) ; 
+
+
+action_id_t* denm_trigger(int signal, application_request_type_id request_id, transmission_params_t* app_params) ;
+action_id_t* denm_update(int signal, application_request_type_id request_id, transmission_params_t* app_params) ; 
+action_id_t* denm_termination(int signal, application_request_type_id request_id, transmission_params_t* app_params) ; 
+
+action_id_t* denm_transmission_management(int signal, application_request_type_id request_id, transmission_params_t* app_params) ; 
+//denm_t* denm_reception_management(DENM_t* packet) ; 
+
+
+
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  

@@ -35,6 +35,7 @@
 #define _GEO_BROADCAST_H_ 1
 
 #include "itsnet_header.h"
+#include "itsnet_common.h" 
 
 int itsnet_geobroadcast_send(struct itsnet_packet* p);
 

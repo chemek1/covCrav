@@ -35,6 +35,7 @@
 
 #include "itsnet_header.h"
 
+
 int convert_format_lat(const double lat);
 
 double inv_convert_format_lat(const int lat);

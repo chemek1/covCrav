@@ -36,6 +36,7 @@
 #define _DLL_SAP_H_ 1
 #include "ieee80211_radiotap.h"
 #include "itsnet_header.h"
+
 #include <stddef.h>
 #include <sys/time.h>
 #include <linux/kernel.h>
@@ -51,7 +52,16 @@
 // (1 << IEEE80211_RADIOTAP_DBM_TX_POWER)	| 
 //  (1 << IEEE80211_RADIOTAP_ANTENNA)       | 
 // (1 << IEEE80211_RADIOTAP_FLAGS)     |
-//(1 << IEEE80211_RADIOTAP_TX_FLAGS)	| 
+//(1 << IEEE80211_RADIOTAP_TX_FLAGS)	|
+
+/*typedef struct btp_b_header {
+	uint16_t destination_port ; 
+	uint16_t destination_port_info ; 
+} btp_b_hdr ;*/ 
+
+  
+
+
 struct covcrav_radiotap_header {
             struct ieee80211_radiotap_header radiotap_header;
             uint8_t rate;
@@ -177,7 +187,7 @@ struct covcrav_radiotap_header {
          * to 0x0800, which is the IP EtherType.
          */
 
-#define ETH_P_ITSNET 0x8947
+#define ETH_P_ITSNET 0x8947 //0x8947
 
         /* see linux/if_ether.h */
 #define ETH_MAC_LEN ETH_ALEN            /* Octets in one ethernet addr   */

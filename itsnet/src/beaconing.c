@@ -63,6 +63,8 @@ void itsnet_beacon_send()
     struct itsnet_position_vector pos;
     pos = get_position_vector();
     
+ 
+    
     brodcast_mac[0]=0xff;
     brodcast_mac[1]=0xff;
     brodcast_mac[2]=0xff;
@@ -81,12 +83,11 @@ void itsnet_beacon_send()
         p->basic_header.itsnet_lifetime=lt_base_10s;
         p->basic_header.itsnet_rhl=1;
         
-
-        p->common_header.itsnet_next_header =  HI_NIBBLE(ANY); /** 4bits common header next header */
-        p->common_header.itsnet_next_header |=  LO_NIBBLE(0); /** 4bits reserved must be set to zero */
         p->common_header.itsnet_header_type_subtype =  HI_NIBBLE(itsnet_beacon_id);
         p->common_header.itsnet_header_type_subtype |= LO_NIBBLE(UNSPECIFIED);
-            
+        p->common_header.itsnet_next_header =  HI_NIBBLE(BTP_B); /** 4bits common header next header */
+        p->common_header.itsnet_next_header |=  LO_NIBBLE(0); /** 4bits reserved must be set to zero */
+       
         p->common_header.traffic_class = CLASS03;
         p->common_header.flags = 0;
         p->common_header.flags  =  Mobile << 7;
@@ -106,6 +107,28 @@ void itsnet_beacon_send()
     itsnet_neighbor_list_print(&neighbor_list);
     INIT_LIST_HEAD(&(tqe.list));
     add_task_rel(&exp_in, &tqe, itsnet_beacon_send);
+}
+
+void itsnet_beacon_send_btp(struct itsnet_packet* p) {
+
+	int res ; 
+
+	uint8_t brodcast_mac[MAX_LLA_LEN];
+	
+	brodcast_mac[0]=0xff;
+    	brodcast_mac[1]=0xff;
+    	brodcast_mac[2]=0xff;
+    	brodcast_mac[3]=0xff;
+    	brodcast_mac[4]=0xff;
+    	brodcast_mac[5]=0xff;
+
+	res = itsnet_packet_send(p, brodcast_mac);	
+	
+	if (res == -1 ) {
+		printf("failed to send packet ") ; 
+	}
+
+
 }
 
 /**

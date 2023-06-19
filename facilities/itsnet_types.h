@@ -473,7 +473,6 @@ struct message
 		struct itsnet_event_indication itsnet_event_ind;
 		struct itsnet_position_sensor_request itsnet_position_sensor_req;
 		struct itsnet_position_sensor_confirm itsnet_position_sensor_conf;
-
 		struct itsnet_unicast_request itsnet_unicast_req;
 		struct itsnet_unicast_confirm itsnet_unicast_conf;
 		struct itsnet_unicast_indication itsnet_unicast_ind;
@@ -488,7 +487,7 @@ struct message
 		struct itsnet_geotopo_indication itsnet_geotopo_ind;
 		struct itsnet_get_security_param_request itsnet_get_security_param_req;
 		struct itsnet_configure_security_param_request itsnet_configure_security_param_req;
-		struct btp_pdu btp ; 
+		btp_b_pdu_t btp ; 
 
 	} payload;
 

@@ -50,25 +50,34 @@ int nbr_packet = 1000;
   
 struct message* btp_data_request(btp_tx_params_t params) {
 
-int length, len, sock ; 
+int length, len, sock ;
+
+
+//printf("station_type in btp_data_request itsnet_btp.c = %d \n", params.data.payload.management.station_type) ; 
 
 //contruction of btp_udp
 
-btp_pdu_t* p ; 
-p = (btp_pdu_t*)malloc(sizeof(btp_pdu_t)) ; 
-memset(p,0,sizeof(btp_pdu_t)) ; 
+btp_b_pdu_t* p ; 
+p = (btp_b_pdu_t*)malloc(sizeof(btp_b_pdu_t)) ; 
+memset(p,0,sizeof(btp_b_pdu_t)) ; 
 if (p == NULL) 
 	printf("allocation error ! \n") ; 
 else {
-	p->btp_header.destination_port = params.destination_port ; 
+	/*p->btp_header.destination_port = params.destination_port ; 
 	if(params.btp_type == BTPA) 
 		p->btp_header.source_port = params.source_port ; 
 	else 
 		p->btp_header.source_port = btp_Port_UNSPECIFIED ; 
 	p->payload = params.data ; 
-	p->payload_length = sizeof(params.data) ; 
+	//p->payload_length = sizeof(params.data) ; */
+	
+	p->btp_header.destination_port = params.destination_port ;
+	p->btp_header.destination_port_info = 0 ; 
+	p->payload = params.data ; 
 	
 	//construction of message 
+	
+	
 	
 	struct message* msg ; 
 	
@@ -87,7 +96,17 @@ else {
 	msg->payload.itsnet_geobroadcast_req.geo_area.longitude = 1;
 	msg->payload.itsnet_geobroadcast_req.geo_area.geo_area_size = GEO_AREA;*/ 
 	
-	msg->payload.btp = *p ; 
+	msg->payload.btp = *p ;
+	
+	
+	
+	printf("btp header in itsnet_btp.c \n") ; 
+	printf("destination port = %d \n", msg->payload.btp.btp_header.destination_port );
+	printf("destination port info = %d \n", msg->payload.btp.btp_header.destination_port_info) ;
+	printf("its pdu header in itsnet_btp.c \n") ;
+	printf("protocol version = %d \n", msg->payload.btp.payload.header.protocol_version) ; 
+	printf("message id = %d \n", msg->payload.btp.payload.header.message_id) ; 
+	printf("station type in btp_data_request itsnet_btp.c = %d \n", msg->payload.btp.payload.payload.management.station_type) ; 
 	
 
 	

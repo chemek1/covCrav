@@ -49,8 +49,8 @@ typedef uint32_t itsnet_time_stamp;     /** time stamp at which the position was
 
 typedef uint32_t itsnet_latitude;     /** latitude of the ITS station */
 typedef uint32_t itsnet_longitude;    /** longitude of the ITS station*/
-typedef uint16_t itsnet_speed;        /** speed of the ITS station*/
-typedef uint16_t itsnet_heading;      /** heading of the ITS station*/
+typedef uint8_t itsnet_speed;        /** speed of the ITS station*/
+typedef uint8_t itsnet_heading;      /** heading of the ITS station*/
 typedef uint16_t itsnet_altitude;     /** altitude of the ITS station*/
 typedef uint8_t itsnet_txpower;       /** Transmission power level with which the packet was sent, in 1⁄2 of dBm*/
 typedef uint8_t itsnet_flags;         /** Flags reserved to distinguish vehicle and RSU */
@@ -61,6 +61,7 @@ typedef uint16_t itsnet_source_port;      /** Port number of the sending applica
 typedef uint16_t itsnet_destination_port; /**Port number of the destination application. It is zero if not used.*/
 typedef uint16_t itsnet_radius;
 typedef uint8_t itsnet_channel;
+typedef uint8_t itsnet_position_accuracy_indicator ; /*** updated ****/ 
 
 /**
  *The structure describes itsnet identity
@@ -111,6 +112,7 @@ struct itsnet_position_vector {
     itsnet_longitude longitude; /** the longitude of the global position in 1/8 microdegree*/
     itsnet_speed speed;         /** current speed in 0.01 meters per second*/
     itsnet_heading heading;     /** current curse in 0.005493247 degrees*/
+    itsnet_position_accuracy_indicator position_accuracy ; 
 };
 typedef struct itsnet_position_vector itsnet_position_vector;
 

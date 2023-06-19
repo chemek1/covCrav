@@ -35,6 +35,7 @@
 #define _ITSNET_PSEUDONYM_H_ 1
 
 #include "itsnet_header.h"
+ 
 
 void set_ego_node_id(struct itsnet_node_id* node_id);
 

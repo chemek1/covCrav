@@ -29,7 +29,7 @@ static int send_socket(message* m)
 {
     int len;
     int length;
-    struct sockaddr_un rem;
+    struct sockaddr_un rem; /*sockaddr_un is a data structure used to represent a unix socket address (server address) */
 
     if((sock = socket(AF_UNIX, SOCK_STREAM, 0)) == -1) {
         perror("socket");
@@ -38,9 +38,10 @@ static int send_socket(message* m)
     printf("Trying to connect...\n");
 
     rem.sun_family = AF_UNIX;
-    strcpy(rem.sun_path, SOCK_ITSNET_PATH);
+    strcpy(rem.sun_path, SOCK_ITSNET_PATH); /*sun_path = the pathname of the server socket the client wants to connect to */
     len = strlen(rem.sun_path) + sizeof(rem.sun_family);
-    if(connect(sock, (struct sockaddr*)&rem, len) == -1) {
+    if(connect(sock, (struct sockaddr*)&rem, len) == -1) { /* connect the client socket to the erver socket */ 
+    
         perror("connect");
         return 2;
     }

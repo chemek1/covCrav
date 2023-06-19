@@ -36,6 +36,7 @@
 
 #include "itsnet_header.h"
 
+
 void itsnet_beacon_send();
 
 void itsnet_beacon_handler(struct itsnet_packet* p);

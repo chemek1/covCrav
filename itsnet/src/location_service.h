@@ -39,6 +39,7 @@
 #endif
 
 #include "itsnet_header.h"
+
 #include "tqueue.h"
 
 #define LOCATION_PACKET_LIST_SIZE 50
